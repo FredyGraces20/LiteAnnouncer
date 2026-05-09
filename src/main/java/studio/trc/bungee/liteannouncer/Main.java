@@ -7,6 +7,7 @@ import studio.trc.bungee.liteannouncer.util.LiteAnnouncerProperties;
 import studio.trc.bungee.liteannouncer.util.PluginControl;
 import studio.trc.bungee.liteannouncer.util.Metrics;
 import studio.trc.bungee.liteannouncer.util.Updater;
+import studio.trc.bungee.liteannouncer.async.TempAnnouncementCleanupTask;
 
 public class Main
     extends Plugin
@@ -30,6 +31,13 @@ public class Main
         getProxy().getPluginManager().registerListener(this, new Updater());
         
         PluginControl.reload();
+        
+        // Initialize temporary announcements cleanup task
+        TempAnnouncementCleanupTask cleanupTask = new TempAnnouncementCleanupTask();
+        if (cleanupTask.isCleanupEnabled()) {
+            cleanupTask.cleanupExpiredAnnouncements();
+            LiteAnnouncerProperties.sendOperationMessage("TempAnnouncementCleanupInitialized", new java.util.HashMap<>());
+        }
         
         //It will run after the server is started.
         if (PluginControl.enableUpdater()) {

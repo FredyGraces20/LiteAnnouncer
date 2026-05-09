@@ -1,0 +1,21 @@
+# 临时公告 - 30天后自动删除
+# 拥有 liteannouncer.createtemp 权限的玩家可以创建一个公告
+# 创建后权限自动移除
+
+# 所有临时公告的全局广播延迟（秒）
+Global-Delay: 120
+
+# 在此天数后自动删除公告
+Expiry-Days: 30
+
+# 临时公告存储
+Announcements:
+    example-temp:
+        Created-Date: '2024-01-15 10:30:00'
+        Expiry-Date: '2024-02-14 10:30:00'
+        Creator: 'Admin'
+        Message: '&6[&e临时&6] &b这是一个临时公告示例！'
+
+# 广播优先级（从上到下）
+Priority:
+- example-temp

@@ -30,6 +30,22 @@ English:
             Not-Found: '{prefix}&cUnknown announcement name: &e{announcement} &c, Please use &a/la list &cto list all announcements.'
             Ignore-On: '{prefix}&aSuccessfully enabled announcement &c{announcement} &adisplay for player &e{player} &a.'
             Ignore-Off: '{prefix}&aSuccessfully enabled announcement &c{announcement} &adisplay for player &e{player} &a.'
+        Temporary:
+            No-Permission: '{prefix}&cYou don''t have permission to create or delete temporary announcements!'
+            Invalid-ID: '{prefix}&cInvalid ID! Use only letters, numbers, and hyphens (a-z, 0-9, -_)'
+            Already-Exists: '{prefix}&cTemporary announcement with ID &e{id} &calready exists!'
+            Not-Found: '{prefix}&cTemporary announcement with ID &e{id} &cnot found!'
+            Create:
+                Help: '{prefix}&cUsage: /la createtemp <id> <message>'
+                Created: |
+                    {prefix}&aTemporary announcement created successfully!
+                    &7ID: &e{id}
+                    &7Message: &e{message}
+                    &7Expires: &e{expiry} &7({days} days)
+                    &7Permission removed (one-time use)
+            Delete:
+                Help: '{prefix}&cUsage: /la deletetemp <id>'
+                Deleted: '{prefix}&aTemporary announcement &e{id} &adeleted successfully!'
     Updater:
         Link:
             Message: '&d&l[ClickHere]'

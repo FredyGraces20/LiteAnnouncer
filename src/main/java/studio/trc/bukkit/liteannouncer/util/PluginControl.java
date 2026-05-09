@@ -16,6 +16,7 @@ import org.bukkit.plugin.Plugin;
 
 import studio.trc.bukkit.liteannouncer.Main;
 import studio.trc.bukkit.liteannouncer.util.tools.Announcement;
+import studio.trc.bukkit.liteannouncer.util.tools.TempAnnouncement;
 import studio.trc.bukkit.liteannouncer.async.AnnouncerThread;
 import studio.trc.bukkit.liteannouncer.configuration.RobustConfiguration;
 import studio.trc.bukkit.liteannouncer.configuration.ConfigurationType;
@@ -29,6 +30,7 @@ public class PluginControl
 {
     private static AnnouncerThread thread = null;
     private static final List<Announcement> cacheAnnouncement = new ArrayList();
+    private static final List<TempAnnouncement> cacheTempAnnouncement = new ArrayList();
     @Getter
     private static final Map<String, JSONComponent> cacheJSONComponent = new HashMap<>();
     
@@ -112,6 +114,14 @@ public class PluginControl
     public static void reloadAnnouncements() {
         cacheAnnouncement.clear();
         RobustConfiguration config = ConfigurationUtil.getConfig(ConfigurationType.ANNOUNCEMENTS);
+        
+        if (config.getConfigurationSection("Announcements") == null) {
+            Map<String, String> placeholders = MessageUtil.getDefaultPlaceholders();
+            placeholders.put("{announcements}", "0");
+            LiteAnnouncerProperties.sendOperationMessage("LoadingAnnouncements", placeholders);
+            return;
+        }
+        
         for (String path : config.getConfigurationSection("Announcements").getKeys(false)) {
             try {
                 String name = config.getString("Announcements." + path + ".Name");
@@ -181,6 +191,14 @@ public class PluginControl
     public static void reloadJSONComponents() {
         cacheJSONComponent.clear();
         RobustConfiguration config = ConfigurationUtil.getConfig(ConfigurationType.COMPONENTS);
+        
+        if (config.getConfigurationSection("Json-Components") == null) {
+            Map<String, String> placeholders = MessageUtil.getDefaultPlaceholders();
+            placeholders.put("{components}", "0");
+            LiteAnnouncerProperties.sendOperationMessage("LoadingComponents", placeholders);
+            return;
+        }
+        
         config.getConfigurationSection("Json-Components").getKeys(false).stream().forEach(path -> {
             try {
                 Map<String, String> placeholders = MessageUtil.getDefaultPlaceholders();
@@ -225,9 +243,14 @@ public class PluginControl
     }
     
     public static List<Announcement> getAnnouncementsByPriority() {
-        return (List<Announcement>) ConfigurationUtil.getConfig(ConfigurationType.ANNOUNCEMENTS).getList("Priority").stream()
+        Object priorityList = ConfigurationUtil.getConfig(ConfigurationType.ANNOUNCEMENTS).getList("Priority");
+        if (priorityList == null) {
+            return new ArrayList<>();
+        }
+        return ((List<?>) priorityList).stream()
                 .map(announcement -> cacheAnnouncement.stream().filter(loadedAnnouncement -> loadedAnnouncement.getConfigPath().equals(announcement)).findFirst().orElse(null))
                 .filter(element -> element != null)
+                .map(element -> (Announcement) element)
                 .collect(Collectors.toList());
     }
     
@@ -253,5 +276,92 @@ public class PluginControl
                 task.run();
             }
         }
+    }
+    
+    /**
+     * Reload temporary announcements
+     */
+    public static void reloadTempAnnouncements() {
+        cacheTempAnnouncement.clear();
+        RobustConfiguration config = ConfigurationUtil.getConfig(ConfigurationType.TEMPORARY_ANNOUNCEMENTS);
+        
+        if (config.getConfigurationSection("Announcements") == null) {
+            return;
+        }
+        
+        for (String id : config.getConfigurationSection("Announcements").getKeys(false)) {
+            try {
+                String message = config.getString("Announcements." + id + ".Message");
+                String creator = config.getString("Announcements." + id + ".Creator");
+                if (creator == null) creator = "Unknown";
+                String createdDateStr = config.getString("Announcements." + id + ".Created-Date");
+                String expiryDateStr = config.getString("Announcements." + id + ".Expiry-Date");
+                
+                if (message == null || createdDateStr == null || expiryDateStr == null) {
+                    continue;
+                }
+                
+                java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                long createdDate = sdf.parse(createdDateStr).getTime();
+                long expiryDate = sdf.parse(expiryDateStr).getTime();
+                
+                TempAnnouncement tempAnnouncement = new TempAnnouncement(id, message, creator, createdDate, expiryDate);
+                cacheTempAnnouncement.add(tempAnnouncement);
+            } catch (Exception ex) {
+                Map<String, String> placeholders = MessageUtil.getDefaultPlaceholders();
+                placeholders.put("{id}", id);
+                placeholders.put("{exception}", ex.getLocalizedMessage() != null ? ex.getLocalizedMessage() : "null");
+                LiteAnnouncerProperties.sendOperationMessage("LoadingTempAnnouncementFailed", placeholders);
+                ex.printStackTrace();
+            }
+        }
+        
+        Map<String, String> placeholders = MessageUtil.getDefaultPlaceholders();
+        placeholders.put("{tempAnnouncements}", String.valueOf(cacheTempAnnouncement.size()));
+        LiteAnnouncerProperties.sendOperationMessage("LoadingTempAnnouncements", placeholders);
+    }
+    
+    /**
+     * Get all temporary announcements
+     */
+    public static List<TempAnnouncement> getTempAnnouncements() {
+        return cacheTempAnnouncement;
+    }
+    
+    /**
+     * Get temporary announcements by priority
+     */
+    public static List<TempAnnouncement> getTempAnnouncementsByPriority() {
+        RobustConfiguration config = ConfigurationUtil.getConfig(ConfigurationType.TEMPORARY_ANNOUNCEMENTS);
+        if (config.getList("Priority") == null) {
+            return new ArrayList<>();
+        }
+        
+        List<String> priorityList = (List<String>) config.getList("Priority");
+        List<TempAnnouncement> result = new ArrayList<>();
+        
+        for (String id : priorityList) {
+            TempAnnouncement tempAnnouncement = cacheTempAnnouncement.stream()
+                .filter(ta -> ta.getId().equals(id))
+                .findFirst()
+                .orElse(null);
+            
+            if (tempAnnouncement != null && !tempAnnouncement.isExpired()) {
+                result.add(tempAnnouncement);
+            }
+        }
+        
+        return result;
+    }
+    
+    /**
+     * Get global delay for temp announcements
+     */
+    public static double getTempAnnouncementDelay() {
+        RobustConfiguration config = ConfigurationUtil.getConfig(ConfigurationType.TEMPORARY_ANNOUNCEMENTS);
+        if (config.get("Global-Delay") == null) {
+            return 120.0;
+        }
+        return config.getDouble("Global-Delay");
     }
 }

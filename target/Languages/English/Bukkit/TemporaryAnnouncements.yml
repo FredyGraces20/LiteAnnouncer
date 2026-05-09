@@ -1,0 +1,21 @@
+# Temporary Announcements - Auto-delete after 30 days
+# Players with liteannouncer.createtemp permission can create ONE announcement
+# Permission is automatically removed after creation
+
+# Global broadcast delay for ALL temporary announcements (in seconds)
+Global-Delay: 120
+
+# Auto-delete announcements after this many days
+Expiry-Days: 30
+
+# Temporary announcements storage
+Announcements:
+    example-temp:
+        Created-Date: '2024-01-15 10:30:00'
+        Expiry-Date: '2024-02-14 10:30:00'
+        Creator: 'Admin'
+        Message: '&6[&eTEMP&6] &bThis is an example temporary announcement!'
+
+# Broadcast priority (from top to bottom)
+Priority:
+- example-temp

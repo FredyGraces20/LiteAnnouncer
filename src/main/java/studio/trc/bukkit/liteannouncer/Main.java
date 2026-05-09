@@ -8,6 +8,7 @@ import studio.trc.bukkit.liteannouncer.util.LiteAnnouncerProperties;
 import studio.trc.bukkit.liteannouncer.util.PluginControl;
 import studio.trc.bukkit.liteannouncer.util.Metrics;
 import studio.trc.bukkit.liteannouncer.util.Updater;
+import studio.trc.bukkit.liteannouncer.async.TempAnnouncementCleanupTask;
 
 public class Main
     extends JavaPlugin
@@ -32,6 +33,13 @@ public class Main
         Bukkit.getPluginManager().registerEvents(new Updater(), this);
         
         PluginControl.reload();
+        
+        // Initialize temporary announcements cleanup task
+        TempAnnouncementCleanupTask cleanupTask = new TempAnnouncementCleanupTask();
+        if (cleanupTask.isCleanupEnabled()) {
+            cleanupTask.cleanupExpiredAnnouncements();
+            LiteAnnouncerProperties.sendOperationMessage("TempAnnouncementCleanupInitialized");
+        }
         
         //It will run after the server is started.
         PluginControl.runBukkitTask(() -> {

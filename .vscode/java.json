@@ -1,0 +1,13 @@
+{
+    "java.compile.problem.severity": {
+        "deprecated": "warning",
+        "unchecked": "warning",
+        "rawtypes": "warning",
+        "unused": "ignore",
+        "restriction": "ignore"
+    },
+    "java.inlayHints.parameterNames.enabled": "none",
+    "java.inlayHints.parameterNames.exclusions": [
+        "**/*.java"
+    ]
+}

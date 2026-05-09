@@ -50,3 +50,9 @@ Permissions:
         Ignore:
             Permission: liteannouncer.command.ignore
             Default: false
+        CreateTemp:
+            Permission: liteannouncer.createtemp
+            Default: false
+        DeleteTemp:
+            Permission: liteannouncer.deletetemp
+            Default: false

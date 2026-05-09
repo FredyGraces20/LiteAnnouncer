@@ -227,12 +227,11 @@ public class LiteAnnouncerCommand
                     priority.add(id);
                     tempConfig.set("Priority", priority);
                     
-                    // Save config - use the raw FileConfiguration from RobustConfiguration
-                    try {
-                        tempConfig.getRawConfig().save("plugins/LiteAnnouncer/TemporaryAnnouncements.yml");
-                    } catch (java.io.IOException e) {
-                        e.printStackTrace();
-                    }
+                    // Save config - use the proper save method
+                    tempConfig.saveConfig();
+                    
+                    // Reload the configuration from disk to ensure consistency
+                    ConfigurationUtil.reloadConfig(ConfigurationType.TEMPORARY_ANNOUNCEMENTS);
                     
                     // Reload temp announcements
                     PluginControl.reloadTempAnnouncements();
@@ -278,12 +277,11 @@ public class LiteAnnouncerCommand
                     priority.remove(id);
                     tempConfig.set("Priority", priority);
                     
-                    // Save
-                    try {
-                        tempConfig.getRawConfig().save("plugins/LiteAnnouncer/TemporaryAnnouncements.yml");
-                    } catch (java.io.IOException e) {
-                        e.printStackTrace();
-                    }
+                    // Save - use the proper save method
+                    tempConfig.saveConfig();
+                    
+                    // Reload the configuration from disk to ensure consistency
+                    ConfigurationUtil.reloadConfig(ConfigurationType.TEMPORARY_ANNOUNCEMENTS);
                     
                     // Reload
                     PluginControl.reloadTempAnnouncements();

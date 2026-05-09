@@ -232,6 +232,9 @@ public class LiteAnnouncerCommand
                 // Save config
                 ConfigurationUtil.saveConfig(ConfigurationType.TEMPORARY_ANNOUNCEMENTS);
                 
+                // Reload the configuration from disk to ensure consistency
+                ConfigurationUtil.reloadConfig(ConfigurationType.TEMPORARY_ANNOUNCEMENTS);
+                
                 // Reload temp announcements
                 PluginControl.reloadTempAnnouncements();
                 
@@ -279,6 +282,9 @@ public class LiteAnnouncerCommand
                 
                 // Save
                 ConfigurationUtil.saveConfig(ConfigurationType.TEMPORARY_ANNOUNCEMENTS);
+                
+                // Reload the configuration from disk to ensure consistency
+                ConfigurationUtil.reloadConfig(ConfigurationType.TEMPORARY_ANNOUNCEMENTS);
                 
                 // Reload
                 PluginControl.reloadTempAnnouncements();

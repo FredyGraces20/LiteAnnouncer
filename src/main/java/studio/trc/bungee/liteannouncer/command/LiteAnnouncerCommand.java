@@ -230,7 +230,7 @@ public class LiteAnnouncerCommand
                 tempConfig.set("Priority", priority);
                 
                 // Save config
-                ConfigurationUtil.getConfig(ConfigurationType.TEMPORARY_ANNOUNCEMENTS).saveConfig();
+                ConfigurationUtil.saveConfig(ConfigurationType.TEMPORARY_ANNOUNCEMENTS);
                 
                 // Reload temp announcements
                 PluginControl.reloadTempAnnouncements();
@@ -278,7 +278,7 @@ public class LiteAnnouncerCommand
                 tempConfig.set("Priority", priority);
                 
                 // Save
-                ConfigurationUtil.getConfig(ConfigurationType.TEMPORARY_ANNOUNCEMENTS).saveConfig();
+                ConfigurationUtil.saveConfig(ConfigurationType.TEMPORARY_ANNOUNCEMENTS);
                 
                 // Reload
                 PluginControl.reloadTempAnnouncements();
